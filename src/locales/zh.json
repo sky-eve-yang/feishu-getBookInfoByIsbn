@@ -1,3 +1,35 @@
 {
-  "title":"标题"
+  "form": {
+    "label": {
+      "address": "address：",
+      "appcode": "appcode：",
+      "addressInput": "请填写 api 请求地址",
+      "appcodeInput": "请填写 appcode",
+      "apiDocument": "API 配置说明文档",
+      "isbnSelectTip": "请选择 ISBN 号对应字段"
+    },
+    "writeData": {
+      "desc": "请选择数据写回模式 ↓",
+      "mode": {
+        "creation": "创建模式",
+        "mapping": "映射模式",
+        "mixed": "混合模式"
+      },
+      "selectAll": "全选",
+      "createTip": "请勾选需要创建的字段",
+      "mapTip": "请勾选需映射的字段",
+      "selectFieldTip": "请选择对应字段",
+      "bookInfo": {
+        "书名": "书名",
+        "作者": "作者",
+        "出版时间": "出版时间",
+        "价格": "价格",
+        "封面": "封面",
+        "简介": "简介"
+      }
+    }
+  },
+  "generate": "生成图书信息",
+  "generateMode": "交互式记录选择",
+  "generateModeInfo": "若不勾选，则默认应用于表格全部记录"
 }

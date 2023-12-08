@@ -5,14 +5,17 @@
 
     <!-- 3. 接口地址 -->
     <el-form-item label="Api" size="large" required>
-      address：<el-input v-model="interfaceAddr" placeholder="填写 api 请求地址" />
-      appcode：<el-input type="password" v-model="appcode" placeholder="填写 appcode" />
-      <el-link type="primary" href="https://jfsq6znqku.feishu.cn/docx/QiEbd3LIgoMfDDxKHMwcNyW4n4M?from=from_copylink" target="_blank">API 配置说明文档</el-link>
+
+      {{ $t('form.label.address') }}<el-input v-model="interfaceAddr" :placeholder="$t('form.label.addressInput')" />
+      {{ $t('form.label.appcode') }}<el-input type="password" v-model="appcode"
+        :placeholder="$t('form.label.appcodeInput')" />
+      <el-link style="color: #3e75f5;" type="primary" href="https://jfsq6znqku.feishu.cn/docx/QiEbd3LIgoMfDDxKHMwcNyW4n4M?from=from_copylink"
+        target="_blank">{{ $t('form.label.apiDocument') }}</el-link>
     </el-form-item>
 
     <!-- 2. 选择 isbn 字段 -->
     <el-form-item label="ISBN" size="large" required>
-      <el-select v-model="IsbnFieldId" placeholder="请选择 ISBN 号对应字段" style="width: 100%">
+      <el-select v-model="IsbnFieldId" :placeholder="$t('form.label.isbnSelectTip')" style="width: 100%">
         <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
       </el-select>
     </el-form-item>
@@ -21,71 +24,77 @@
 
   <!-- 3.5 选择数据写入的方式：1-字段映射  2-创建字段 -->
   <!-- 4. 写回多维数据表格 -->
-  <div class="write-data-tip">Select the data write back mode ↓</div>
+  <div class="write-data-tip">{{ $t('form.writeData.desc') }}</div>
   <el-radio-group v-model="dataWritenType" size="default">
-    <el-radio-button label="Only Creation" />
-    <el-radio-button label="Only Mapping" />
-    <el-radio-button label="Mixed Mode" />
+    <el-radio-button label="1">{{ $t('form.writeData.mode.creation') }}</el-radio-button>
+    <el-radio-button label="2">{{ $t('form.writeData.mode.mapping') }}</el-radio-button>
+    <el-radio-button label="3">{{ $t('form.writeData.mode.mixed') }}</el-radio-button>
   </el-radio-group>
 
   <!-- Only Creation: -->
-  <div v-if="dataWritenType == 'Only Creation'" class="field-creation">
-    <el-alert title="请勾选需要创建的字段" type="info" show-icon />
+  <div v-if="dataWritenType == 1" class="field-creation">
+    <el-alert style="background-color: #e1eaff;color: #606266;" :title="$t('form.writeData.createTip')" type="info" show-icon />
 
     <div class="create-fields-checklist">
       <el-checkbox v-model="checkAllToCreate" :indeterminate="isIndeterminateToCreate"
-        @change="handlecheckAllToCreateChange">全选</el-checkbox>
+        @change="handlecheckAllToCreateChange">{{ $t('form.writeData.selectAll') }}</el-checkbox>
       <el-checkbox-group v-model="checkedFieldsToCreate" @change="handleCheckedFieldsToCreateChange">
-        <el-checkbox v-for="fieldToCreate in fieldsToCreate" :key="fieldToCreate.key" :label="fieldToCreate.label">{{
-          fieldToCreate.key
-        }}</el-checkbox>
+        <el-checkbox v-for="fieldToCreate in fieldsToCreate" :key="fieldToCreate.key" :label="fieldToCreate.label">
+          {{ $t(`form.writeData.bookInfo.${fieldToCreate.key}`) }}
+        </el-checkbox>
       </el-checkbox-group>
     </div>
   </div>
 
   <!-- Only Mapping: -->
-  <div v-if="dataWritenType == 'Only Mapping'" class="field-mapping">
-    <el-alert style="margin-top: 20px;" title="请勾选需映射的字段" type="info" show-icon />
+  <div v-if="dataWritenType == 2" class="field-mapping">
+    <el-alert style="margin-top: 20px;background-color: #e1eaff;color: #606266;" :title="$t('form.writeData.mapTip')" type="info" show-icon />
 
     <div class="map-fields-checklist">
-      <el-checkbox v-model="checkAllToMap" :indeterminate="isIndeterminateToMap"
-        @change="handlecheckAllToMapChange">全选</el-checkbox>
+      <el-checkbox v-model="checkAllToMap" :indeterminate="isIndeterminateToMap" @change="handlecheckAllToMapChange">{{
+        $t('form.writeData.selectAll') }}</el-checkbox>
       <el-checkbox-group v-model="checkedFieldsToMap" @change="handleCheckedFieldsToMapChange">
-        <el-checkbox v-for="fieldToMap in fieldsToMap" :key="fieldToMap.key" :label="fieldToMap.label">{{
-          fieldToMap.key
-        }}</el-checkbox>
+        <el-checkbox v-for="fieldToMap in fieldsToMap" :key="fieldToMap.key" :label="fieldToMap.label">
+          {{ $t(`form.writeData.bookInfo.${fieldToMap.key}`) }}
+        </el-checkbox>
       </el-checkbox-group>
     </div>
 
     <el-form style="margin-top: 20px;" ref="form2" label-width="80px">
-      <el-form-item v-if="isMapped('bookNameV')" label="书名" size="large" required>
-        <el-select clearable v-model="bookFieldData.bookNameFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('bookNameV')" :label="$t(`form.writeData.bookInfo.书名`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.bookNameFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('authorV')" label="作者" size="large" required>
-        <el-select clearable v-model="bookFieldData.authorFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('authorV')" :label="$t(`form.writeData.bookInfo.作者`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.authorFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="isMapped('pressDateV')" label="出版时间" size="large" required>
-        <el-select clearable v-model="bookFieldData.pressDateFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('pressDateV')" :label="$t(`form.writeData.bookInfo.出版时间`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.pressDateFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('picturesV')" label="封面" size="large" required>
-        <el-select clearable v-model="bookFieldData.picturesFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('picturesV')" :label="$t(`form.writeData.bookInfo.封面`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.picturesFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('priceV')" label="定价" size="large" required>
-        <el-select clearable v-model="bookFieldData.priceFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('priceV')" :label="$t(`form.writeData.bookInfo.价格`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.priceFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('bookDescV')" label="简介" size="large" required>
-        <el-select clearable v-model="bookFieldData.bookDescFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('bookDescV')" :label="$t(`form.writeData.bookInfo.简介`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.bookDescFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
@@ -93,61 +102,67 @@
   </div>
 
   <!-- Mixed Mode: -->
-  <div v-if="dataWritenType == 'Mixed Mode'" class="field-creation">
-    <el-alert title="请勾选需要创建的字段" type="info" show-icon />
+  <div v-if="dataWritenType == 3" class="field-creation">
+    <el-alert style="background-color: #e1eaff;color: #606266;" :title="$t('form.writeData.createTip')" type="info" show-icon />
     <div class="create-fields-checklist">
       <el-checkbox v-model="checkAllToCreate" :indeterminate="isIndeterminateToCreate"
-        @change="handlecheckAllToCreateChange">全选</el-checkbox>
+        @change="handlecheckAllToCreateChange">{{ $t('form.writeData.selectAll') }}</el-checkbox>
       <el-checkbox-group v-model="checkedFieldsToCreate" @change="handleCheckedFieldsToCreateChange">
         <el-checkbox v-for="fieldToCreate in fieldsToCreate" :key="fieldToCreate.key" :label="fieldToCreate.label">{{
-          fieldToCreate.key
+          $t(`form.writeData.bookInfo.${fieldToCreate.key}`)
         }}</el-checkbox>
       </el-checkbox-group>
     </div>
 
 
 
-    <el-alert style="margin: 40px 0 20px 0;" title="请勾选需映射的字段" type="info" show-icon />
+    <el-alert style="margin: 40px 0 20px 0;background-color: #e1eaff;color: #606266;" :title="$t('form.writeData.mapTip')" type="info" show-icon />
 
     <div class="map-fields-checklist">
-      <el-checkbox v-model="checkAllToMap" :indeterminate="isIndeterminateToMap"
-        @change="handlecheckAllToMapChange">全选</el-checkbox>
+      <el-checkbox v-model="checkAllToMap" :indeterminate="isIndeterminateToMap" @change="handlecheckAllToMapChange">{{
+        $t('form.writeData.selectAll') }}</el-checkbox>
       <el-checkbox-group v-model="checkedFieldsToMap" @change="handleCheckedFieldsToMapChange">
         <el-checkbox v-for="fieldToMap in fieldsToMap" :key="fieldToMap.key" :label="fieldToMap.label">{{
-          fieldToMap.key
+          $t(`form.writeData.bookInfo.${fieldToMap.key}`)
         }}</el-checkbox>
       </el-checkbox-group>
     </div>
 
     <el-form style="margin-top: 20px;" ref="form2" label-width="80px">
-      <el-form-item v-if="isMapped('bookNameV')" label="书名" size="large" required>
-        <el-select clearable v-model="bookFieldData.bookNameFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('bookNameV')" :label="$t(`form.writeData.bookInfo.书名`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.bookNameFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('authorV')" label="作者" size="large" required>
-        <el-select clearable v-model="bookFieldData.authorFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('authorV')" :label="$t(`form.writeData.bookInfo.作者`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.authorFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="isMapped('pressDateV')" label="出版时间" size="large" required>
-        <el-select clearable v-model="bookFieldData.pressDateFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('pressDateV')" :label="$t(`form.writeData.bookInfo.出版时间`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.pressDateFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('picturesV')" label="封面" size="large" required>
-        <el-select clearable v-model="bookFieldData.picturesFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('picturesV')" :label="$t(`form.writeData.bookInfo.封面`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.picturesFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('priceV')" label="定价" size="large" required>
-        <el-select clearable v-model="bookFieldData.priceFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('priceV')" :label="$t(`form.writeData.bookInfo.价格`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.priceFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="isMapped('bookDescV')" label="简介" size="large" required>
-        <el-select clearable v-model="bookFieldData.bookDescFId" placeholder="请选择对应字段" style="width: 100%">
+      <el-form-item v-if="isMapped('bookDescV')" :label="$t(`form.writeData.bookInfo.简介`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.bookDescFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
@@ -157,7 +172,14 @@
 
 
   <div class="alert-tip">
-    <el-button style="margin: 20px 0;" :disabled="isRequiredBlank" type="primary" @click="writeData">生成图书信息</el-button>
+    <div>
+      <el-tooltip class="box-item" effect="dark" :content="$t('generateModeInfo')" placement="top-start">
+        <el-checkbox v-model="isSelectPartRecords" :label="$t('generateMode')" size="large" />
+      </el-tooltip>
+    </div>
+
+    <el-button color="#3370ff" style="margin: 20px 0;;" :disabled="isRequiredBlank" type="primary" @click="writeData">{{ $t('generate')
+    }}</el-button>
     <el-alert v-if="isDataWriten === 1" title="Success!" type="success" show-icon />
     <el-alert v-if="isDataWriten === 2" :title="requestErrorInfo" type="error" show-icon />
   </div>
@@ -166,6 +188,7 @@
 <script>
 import { FieldType, bitable } from '@lark-base-open/js-sdk';
 import { ref, onMounted, computed, h } from 'vue';
+import { useI18n } from 'vue-i18n';
 import {
   ElButton,
   ElForm,
@@ -176,7 +199,6 @@ import {
 } from 'element-plus';
 
 import axios from 'axios';
-
 
 export default {
   components: {
@@ -189,13 +211,16 @@ export default {
 
   },
   setup() {
+    const { t } = useI18n();
+
     // 数据区域---------
     // -- 辅助数据
     const interfaceAddr = ref('https://jisuisbn.market.alicloudapi.com/isbn/query')
     const appcode = ref('db7bd581534a4da2b13f60713ff83396')
-    const dataWritenType = ref('Only Mapping')  // 选择数据写回模式
+    const dataWritenType = ref(2)  // 选择数据写回模式: 1-创建模式  2-映射模式  3-混合模式
     const requestErrorInfo = ref('')   // 数据请求结果提示
     const isDataWriten = ref(0)   // 数据请求结果提示の控制变量
+    const isSelectPartRecords = ref(false)  // 是否应用于整个table表  true-是  false-选择交互
 
     // -- -- Only Creation Mode 下的辅助变量
     const checkAllToCreate = ref(false)
@@ -291,7 +316,7 @@ export default {
     // 数据预处理区域----------  是否存在必填项为空的情况
     const isRequiredBlank = computed(() => {
 
-      if (dataWritenType.value == 'Only Creation')
+      if (dataWritenType.value == 1)
         return !(IsbnFieldId.value && interfaceAddr.value && appcode.value)
       else {
         if ((IsbnFieldId.value && interfaceAddr.value && appcode.value) == false) {
@@ -366,37 +391,37 @@ export default {
           case 'picturesV':
             bookFieldData.value.picturesFId = await table.addField({
               type: FieldType.Url,
-              name: '封面',
+              name: t(`form.writeData.bookInfo.封面`),
             })
             break;
           case 'bookNameV':
             bookFieldData.value.bookNameFId = await table.addField({
               type: FieldType.Text,
-              name: '书名',
+              name: t(`form.writeData.bookInfo.书名`),
             })
             break;
           case 'authorV':
             bookFieldData.value.authorFId = await table.addField({
               type: FieldType.Text,
-              name: '作者名',
+              name: t(`form.writeData.bookInfo.作者`),
             })
             break;
           case 'pressDateV':
             bookFieldData.value.pressDateFId = await table.addField({
               type: FieldType.Text,
-              name: '出版时间',
+              name: t(`form.writeData.bookInfo.出版时间`),
             })
             break;
           case 'priceV':
             bookFieldData.value.priceFId = await table.addField({
               type: FieldType.Currency,
-              name: '定价',
+              name: t(`form.writeData.bookInfo.价格`),
             })
             break;
           case 'bookDescV':
             bookFieldData.value.bookDescFId = await table.addField({
               type: FieldType.Text,
-              name: '简介',
+              name: t(`form.writeData.bookInfo.简介`),
             })
             break;
           default:
@@ -411,7 +436,7 @@ export default {
     const writeData = async (bookData, fieldId, RecordId) => {
 
       // == 混合模式下的非空判断  都要选择
-      if (dataWritenType.value == 'Mixed Mode') {
+      if (dataWritenType.value == 3) {
         if (checkedFieldsToCreate.value.length == 0) {
           await bitable.ui.showToast({
             toastType: 'warning',
@@ -448,18 +473,26 @@ export default {
 
       const { tableId, viewId } = await bitable.base.getSelection();
       const table = await bitable.base.getActiveTable();
-      // 全部记录
-      // const view = await table.getViewById(viewId);
-      // const RecordList = await view.getVisibleRecordIdList()
+      const view = await table.getViewById(viewId);
 
-      // 选择记录会话框
-      const RecordList = await bitable.ui.selectRecordIdList(tableId, viewId);
+      let RecordList = []
+
+      if (isSelectPartRecords.value) {
+        // 选择记录会话框
+        RecordList = await bitable.ui.selectRecordIdList(tableId, viewId);
+      } else {
+        // 全部记录
+        RecordList = await view.getVisibleRecordIdList()
+      }
+      
+
+      
 
 
       console.log("RecordList:", RecordList)
 
       // == 创建字段
-      if (dataWritenType.value != 'Only Mapping') {
+      if (dataWritenType.value != 2) {
         try {
           await createFields()
         } catch (error) {
@@ -490,7 +523,7 @@ export default {
 
         console.log("bookData:", bookData.value)
 
-        if (dataWritenType.value != 'Only Mapping') {
+        if (dataWritenType.value != 2) {
           for (let toCreateField of checkedFieldsToCreate.value) {
             switch (toCreateField) {
               case 'picturesV':
@@ -518,7 +551,7 @@ export default {
           }
         }
 
-        if (dataWritenType.value != 'Only Creation') {
+        if (dataWritenType.value != 1) {
           for (let toMapField of checkedFieldsToMap.value) {
             switch (toMapField) {
               case 'picturesV':
@@ -638,7 +671,8 @@ export default {
       handleCheckedFieldsToCreateChange,
       handlecheckAllToMapChange,
       handleCheckedFieldsToMapChange,
-      isMapped
+      isMapped,
+      isSelectPartRecords
     }
   }
 };
@@ -666,4 +700,21 @@ export default {
 .field-mapping {
   margin-top: 20px 0;
 }
+
+:deep(.el-icon) {
+  color: #3370ff !important;
+}
+
+:deep(.el-radio-button__original-radio:checked+.el-radio-button__inner) {
+  background-color: #3370ff;
+}
+
+:deep(.el-radio-button__inner:hover) {
+  color: #3e75f5;
+}
+
+:deep(.el-radio-button__original-radio:checked+.el-radio-button__inner:hover) {
+  color: #fff;
+}
+
 </style>

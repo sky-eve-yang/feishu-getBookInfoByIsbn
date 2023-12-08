@@ -1,3 +1,35 @@
 {
-  "title":"title"
+  "form": {
+    "label": {
+      "address": "address：",
+      "appcode": "appcode：",
+      "addressInput": "Please fill in the API request address",
+      "appcodeInput": "Please fill in the appcode",
+      "apiDocument": "API Configuration Documentation",
+      "isbnSelectTip": "Please select the corresponding field for ISBN"
+    },
+    "writeData": {
+      "desc": "Please select the data write-back mode ↓",
+      "mode": {
+        "creation": "Creation Mode",
+        "mapping": "Mapping Mode",
+        "mixed": "Mixed Mode"
+      },
+      "selectAll": "Select All",
+      "createTip": "Please check the fields to be created",
+      "mapTip": "Please check the fields to be mapped",
+      "selectFieldTip": "Please select the corresponding field",
+      "bookInfo": {
+        "书名": "Title",
+        "作者": "Author",
+        "出版时间": "Publication Date",
+        "价格": "Price",
+        "封面": "Cover",
+        "简介": "Description"
+      }
+    }
+  },
+  "generate": "Generate Book Information",
+  "generateMode": "Interactive Record Selection",
+  "generateModeInfo": "If not selected, it will be applied to all records in the table by default"
 }
