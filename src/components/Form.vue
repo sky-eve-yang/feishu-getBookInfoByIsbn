@@ -73,6 +73,12 @@
           <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
         </el-select>
       </el-form-item>
+      <el-form-item v-if="isMapped('publisherV')" :label="$t(`form.writeData.bookInfo.出版社`)" size="large" required>
+        <el-select clearable v-model="bookFieldData.publisherFId" :placeholder="$t('form.writeData.selectFieldTip')"
+          style="width: 100%">
+          <el-option v-for="meta in fieldListSeView" :key="meta.id" :label="meta.name" :value="meta.id" />
+        </el-select>
+      </el-form-item>
 
       <el-form-item v-if="isMapped('pressDateV')" :label="$t(`form.writeData.bookInfo.出版时间`)" size="large" required>
         <el-select clearable v-model="bookFieldData.pressDateFId" :placeholder="$t('form.writeData.selectFieldTip')"
@@ -200,6 +206,7 @@ import {
 
 import axios from 'axios';
 
+
 export default {
   components: {
     ElButton,
@@ -215,8 +222,8 @@ export default {
 
     // 数据区域---------
     // -- 辅助数据
-    const interfaceAddr = ref('https://jisuisbn.market.alicloudapi.com/isbn/query')
-    const appcode = ref('db7bd581534a4da2b13f60713ff83396')
+    const interfaceAddr = ref('https://feishu-get-ig-data-by-link-backend-1-wuyi.replit.app')
+    const appcode = ref('')
     const dataWritenType = ref(2)  // 选择数据写回模式: 1-创建模式  2-映射模式  3-混合模式
     const requestErrorInfo = ref('')   // 数据请求结果提示
     const isDataWriten = ref(0)   // 数据请求结果提示の控制变量
@@ -237,6 +244,10 @@ export default {
       {
         "key": "出版时间",
         "label": "pressDateV"
+      },
+      {
+        "key": "出版社",
+        "label": "publisherV"
       },
       {
         "key": "价格",
@@ -270,6 +281,10 @@ export default {
         "label": "pressDateV"
       },
       {
+        "key": "出版社",
+        "label": "publisherV"
+      },
+      {
         "key": "价格",
         "label": "priceV"
       },
@@ -298,7 +313,8 @@ export default {
       pressDateV: '',
       priceV: '',
       picturesV: '',
-      bookDescV: ''
+      bookDescV: '',
+      publisherV: ''
     })  // 写回记录对应的数据值
 
     const bookFieldData = ref({
@@ -307,7 +323,8 @@ export default {
       pressDateFId: '',
       priceFId: '',
       picturesFId: '',
-      bookDescFId: ''
+      bookDescFId: '',
+      publisherFId: ''
     })  //  写回数据对应的字段列ID
 
 
@@ -334,12 +351,15 @@ export default {
     })   // 生成图书信息の控制变量：必填字段是否都已填写   计算属性 
 
     const getBookData = async (IsbnValue) => {
-      const url = `${interfaceAddr.value}?isbn=${IsbnValue}`;
+      const url = `${interfaceAddr.value}/fetch_book_info`;
+
+
+
 
       const config = {
-        headers: {
-          'Authorization': `APPCODE ${appcode.value}`,
-          'Content-Type': 'application/json; charset=UTF-8'
+        params: {
+          isbn: IsbnValue,
+          appcode: appcode.value
         }
       };
 
@@ -351,15 +371,17 @@ export default {
           res = response
 
         }).catch(err => {
-          isDataWriten.value = 2
-          requestErrorInfo.value = err
+          console.log("err", err)
+          // isDataWriten.value = 2
+          // requestErrorInfo.value = err
 
         })
 
-      console.log(res)
+      console.log("res", res)
       if (res.status === 200)
         return res.data.result
-
+      else
+        return "ERROR"
 
 
     }     // 接口请求  
@@ -404,6 +426,12 @@ export default {
             bookFieldData.value.authorFId = await table.addField({
               type: FieldType.Text,
               name: t(`form.writeData.bookInfo.作者`),
+            })
+            break;
+          case 'publisherV':
+            bookFieldData.value.publisherFId = await table.addField({
+              type: FieldType.Text,
+              name: t(`form.writeData.bookInfo.出版社`),
             })
             break;
           case 'pressDateV':
@@ -470,6 +498,8 @@ export default {
         return
       }
 
+      setLocalStorage()
+
 
       const { tableId, viewId } = await bitable.base.getSelection();
       const table = await bitable.base.getActiveTable();
@@ -505,23 +535,39 @@ export default {
         }
       }
 
+      
+
 
       for (let Record of RecordList) {
         console.log("Record", Record)
         let IsbnValue = await getIsbnValue(Record)
+        console.log("IsbnValue", IsbnValue)
 
-        let bookData = await getBookData(IsbnValue)
-        console.log(bookData)
-        bookData.value = {
-          'bookNameV': bookData.title,
-          'authorV': bookData.author,
-          'pressDateV': bookData.pubdate,
-          'priceV': bookData.price,
-          'picturesV': bookData.pic,
-          'bookDescV': bookData.summary
+        let requsetBookData = await getBookData(IsbnValue)
+        console.log("bookData:", bookData)
+
+        if (requsetBookData == 'ERROR') {
+          bookData.value = {
+          'bookNameV': t('requestErrorTip'),
+          'authorV':t('requestErrorTip'),
+          'publisherV': t('requestErrorTip'),
+          'pressDateV': t('requestErrorTip'),
+          'priceV': 0,
+          'picturesV': t('requestErrorTip'),
+          'bookDescV': t('requestErrorTip')
+          }
+        } else {
+          bookData.value = {
+            'bookNameV': requsetBookData.title,
+            'authorV': requsetBookData.author,
+            'publisherV': requsetBookData.publisher,
+            'pressDateV': requsetBookData.pubdate,
+            'priceV': requsetBookData.price,
+            'picturesV': requsetBookData.pic,
+            'bookDescV': requsetBookData.summary
+          }
         }
-
-        console.log("bookData:", bookData.value)
+        
 
         if (dataWritenType.value != 2) {
           for (let toCreateField of checkedFieldsToCreate.value) {
@@ -534,6 +580,9 @@ export default {
                 break;
               case 'authorV':
                 await table.setCellValue(bookFieldData.value.authorFId, Record, [{ type: 'text', text: bookData.value.authorV }])
+                break;
+              case 'publisherV':
+                await table.setCellValue(bookFieldData.value.publisherFId, Record, [{ type: 'text', text: bookData.value.publisherV }])
                 break;
               case 'pressDateV':
                 await table.setCellValue(bookFieldData.value.pressDateFId, Record, [{ type: 'text', text: bookData.value.pressDateV }])
@@ -563,6 +612,9 @@ export default {
               case 'authorV':
                 await table.setCellValue(bookFieldData.value.authorFId, Record, [{ type: 'text', text: bookData.value.authorV }])
                 break;
+              case 'publisherV':
+                await table.setCellValue(bookFieldData.value.publisherFId, Record, [{ type: 'text', text: bookData.value.publisherV }])
+                break;
               case 'pressDateV':
                 await table.setCellValue(bookFieldData.value.pressDateFId, Record, [{ type: 'text', text: bookData.value.pressDateV }])
                 break;
@@ -585,6 +637,35 @@ export default {
       return true
     }
 
+    /**
+ * @common(set) {读取缓存，并赋值给相关变量}
+ */
+const setLocalStorage = () => {
+
+  localStorage.setItem('appcode', appcode.value)   // string 类型
+  localStorage.setItem('dataWritenType', dataWritenType.value)   // string 类型
+  localStorage.setItem('IsbnFieldId', IsbnFieldId.value)   // string 类型
+  
+}
+
+    
+    /**
+ * @common(set) {读取缓存，并赋值给相关变量}
+ */
+  const setVariableFromLocalStorage = () => {
+
+    if (localStorage.getItem('appcode') !== null) {  // string 类型
+      appcode.value = localStorage.getItem('appcode')
+    }
+    if (localStorage.getItem('dataWritenType') !== null) {  // string 类型
+      dataWritenType.value = localStorage.getItem('dataWritenType')
+    }
+    if (localStorage.getItem('IsbnFieldId') !== null) {  // string 类型
+      IsbnFieldId.value = localStorage.getItem('IsbnFieldId')
+    }
+    
+
+  }
 
     // 数据后处理区域---------
     // Create==全选事件
@@ -644,7 +725,7 @@ export default {
       const view = await table.getViewById(selection.viewId)
       fieldListSeView.value = await view.getFieldMetaList()
 
-
+      setVariableFromLocalStorage()
     })
 
     return {

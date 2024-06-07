@@ -22,6 +22,7 @@
       "bookInfo": {
         "书名": "Title",
         "作者": "Author",
+        "出版社": "Publisher",
         "出版时间": "Publication Date",
         "价格": "Price",
         "封面": "Cover",
@@ -31,5 +32,6 @@
   },
   "generate": "Generate Book Information",
   "generateMode": "Interactive Record Selection",
-  "generateModeInfo": "If not selected, it will be applied to all records in the table by default"
+  "generateModeInfo": "If not selected, it will be applied to all records in the table by default",
+  "requestErrorTip": "No book information retrieved"
 }

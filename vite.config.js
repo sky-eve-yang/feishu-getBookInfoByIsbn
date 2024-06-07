@@ -8,8 +8,9 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   server: {
-    host: true
+    host: '0.0.0.0'
   },
   plugins: [
     vue(),

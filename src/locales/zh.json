@@ -21,6 +21,7 @@
       "selectFieldTip": "请选择对应字段",
       "bookInfo": {
         "书名": "书名",
+        "出版社": "出版社",
         "作者": "作者",
         "出版时间": "出版时间",
         "价格": "价格",
@@ -31,5 +32,6 @@
   },
   "generate": "生成图书信息",
   "generateMode": "交互式记录选择",
-  "generateModeInfo": "若不勾选，则默认应用于表格全部记录"
+  "generateModeInfo": "若不勾选，则默认应用于表格全部记录",
+  "requestErrorTip": "未检索到图书信息"
 }
