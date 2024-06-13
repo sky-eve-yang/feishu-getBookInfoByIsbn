@@ -222,7 +222,7 @@ export default {
 
     // 数据区域---------
     // -- 辅助数据
-    const interfaceAddr = ref('https://feishu-get-ig-data-by-link-backend-1-wuyi.replit.app')
+    const interfaceAddr = ref('https://get-book-info-by-isbn-backend.replit.app')
     const appcode = ref('')
     const dataWritenType = ref(2)  // 选择数据写回模式: 1-创建模式  2-映射模式  3-混合模式
     const requestErrorInfo = ref('')   // 数据请求结果提示
