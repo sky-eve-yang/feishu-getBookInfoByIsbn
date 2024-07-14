@@ -6,7 +6,7 @@
     <!-- 3. 接口地址 -->
     <el-form-item label="Api" size="large" required>
 
-      {{ $t('form.label.address') }}<el-input v-model="interfaceAddr" :placeholder="$t('form.label.addressInput')" />
+      <!-- {{ $t('form.label.address') }}<el-input v-model="interfaceAddr" :placeholder="$t('form.label.addressInput')" /> -->
       {{ $t('form.label.appcode') }}<el-input type="password" v-model="appcode"
         :placeholder="$t('form.label.appcodeInput')" />
       <el-link style="color: #3e75f5;" type="primary" href="https://jfsq6znqku.feishu.cn/docx/QiEbd3LIgoMfDDxKHMwcNyW4n4M?from=from_copylink"
